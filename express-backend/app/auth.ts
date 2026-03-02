@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-const API_KEY = process.env.API_KEY;
+const EXPRESS_API_KEY = process.env.EXPRESS_API_KEY;
 const HEADER_NAME = 'x-api-key';
 
 export function requireApiKey(
@@ -8,9 +8,9 @@ export function requireApiKey(
   res: Response,
   next: NextFunction
 ): void {
-  const key = API_KEY?.trim();
+  const key = EXPRESS_API_KEY?.trim();
   if (!key) {
-    res.status(500).json({ error: 'Server missing API_KEY configuration' });
+    res.status(500).json({ error: 'Server missing EXPRESS_API_KEY configuration' });
     return;
   }
 
