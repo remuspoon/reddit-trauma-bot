@@ -1,48 +1,35 @@
-// New REST-based Chroma client using the HTTP API instead of CloudClient.
-// This does not change the existing behavior; it is exposed via a separate function.
+import OpenAI from "openai";
 
 const DEFAULT_CHROMA_BASE_URL = "https://api.trychroma.com";
 const DEFAULT_OPENAI_EMBEDDING_MODEL = "text-embedding-3-small";
-
-function getChromaBaseUrl(): string {
-  return (process.env.CHROMA_BASE_URL || DEFAULT_CHROMA_BASE_URL).replace(/\/$/, "");
-}
 
 interface ChromaRestQueryResponse {
   metadatas?: Array<Array<Record<string, unknown>>>;
 }
 
-async function getOpenAIEmbedding(input: string): Promise<number[]> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_EMBEDDING_MODEL || DEFAULT_OPENAI_EMBEDDING_MODEL;
+let openaiClient: OpenAI | null = null;
 
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY must be set to use OpenAI embeddings");
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OPENAI_API_KEY must be set to use OpenAI embeddings");
+    }
+    openaiClient = new OpenAI({ apiKey });
   }
+  return openaiClient;
+}
 
-  const res = await fetch("https://api.openai.com/v1/embeddings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      input,
-      dimensions: 384,
-    }),
+async function getOpenAIEmbedding(input: string): Promise<number[]> {
+  const client = getOpenAIClient();
+  const model = DEFAULT_OPENAI_EMBEDDING_MODEL;
+
+  const response = await client.embeddings.create({
+    model,
+    input,
   });
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`OpenAI embeddings request failed: ${res.status} ${body}`);
-  }
-
-  const data = (await res.json()) as {
-    data?: Array<{ embedding: number[] }>;
-  };
-
-  const embedding = data.data?.[0]?.embedding;
+  const embedding = response.data?.[0]?.embedding;
   if (!embedding || !Array.isArray(embedding)) {
     throw new Error("OpenAI embeddings response did not contain an embedding");
   }
@@ -63,8 +50,7 @@ export async function queryViaRest(query: string): Promise<string[]> {
   // First, get an embedding for the query text from OpenAI.
   const embedding = await getOpenAIEmbedding(query);
 
-  const baseUrl = getChromaBaseUrl();
-  const url = `${baseUrl}/api/v2/tenants/${encodeURIComponent(
+  const url = `${DEFAULT_CHROMA_BASE_URL}/api/v2/tenants/${encodeURIComponent(
     tenant
   )}/databases/${encodeURIComponent(database || "")}/collections/${encodeURIComponent(collectionId || "")}/query`;
 
