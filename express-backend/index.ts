@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { requireApiKey } from './app/auth.js';
-import { query } from './app/query.js';
+import { queryViaRest } from './app/query.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +18,7 @@ app.get('/', (_req, res) => {
   res.json({ message: 'Hello World!' });
 });
 
+// Chroma query via REST + OpenAI embeddings (no chromadb SDK).
 app.post('/api/query', requireApiKey, async (req, res) => {
   const queryText = req.body?.query;
   if (typeof queryText !== 'string' || !queryText.trim()) {
@@ -25,7 +26,7 @@ app.post('/api/query', requireApiKey, async (req, res) => {
     return;
   }
   try {
-    const permalinks = await query(queryText.trim());
+    const permalinks = await queryViaRest(queryText.trim());
     res.json({ permalinks });
   } catch (err) {
     console.error('Chroma query error:', err);
@@ -33,5 +34,19 @@ app.post('/api/query', requireApiKey, async (req, res) => {
   }
 });
 
+app.post('/api/query-rest', requireApiKey, async (req, res) => {
+  const queryText = req.body?.query;
+  if (typeof queryText !== 'string' || !queryText.trim()) {
+    res.status(400).json({ error: 'Missing or invalid "query" in body' });
+    return;
+  }
+  try {
+    const permalinks = await queryViaRest(queryText.trim());
+    res.json({ permalinks });
+  } catch (err) {
+    console.error('Chroma REST query error:', err);
+    res.status(500).json({ error: 'REST query failed' });
+  }
+});
 
 export default app;
