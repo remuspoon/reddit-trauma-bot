@@ -18,7 +18,7 @@ app.get('/', (_req, res) => {
   res.json({ message: 'Hello World!' });
 });
 
-// Chroma query via REST + OpenAI embeddings (no chromadb SDK).
+// Chroma query via REST + OpenAI embeddings.
 app.post('/api/query', requireApiKey, async (req, res) => {
   const queryText = req.body?.query;
   if (typeof queryText !== 'string' || !queryText.trim()) {
@@ -31,21 +31,6 @@ app.post('/api/query', requireApiKey, async (req, res) => {
   } catch (err) {
     console.error('Chroma query error:', err);
     res.status(500).json({ error: 'Query failed' });
-  }
-});
-
-app.post('/api/query-rest', requireApiKey, async (req, res) => {
-  const queryText = req.body?.query;
-  if (typeof queryText !== 'string' || !queryText.trim()) {
-    res.status(400).json({ error: 'Missing or invalid "query" in body' });
-    return;
-  }
-  try {
-    const permalinks = await queryViaRest(queryText.trim());
-    res.json({ permalinks });
-  } catch (err) {
-    console.error('Chroma REST query error:', err);
-    res.status(500).json({ error: 'REST query failed' });
   }
 });
 
