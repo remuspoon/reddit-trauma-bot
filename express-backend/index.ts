@@ -8,9 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-const isServerless =
-  process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
-if (!isServerless) {
+if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
   });
