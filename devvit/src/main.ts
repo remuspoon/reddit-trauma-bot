@@ -1,11 +1,10 @@
 import { Devvit, SettingScope } from "@devvit/public-api";
 
 // Add your Express backend domain here so the app is allowed to fetch it.
-const BACKEND_DOMAINS = ["https://remuspoon.com"];
 
 Devvit.configure({
   redditAPI: true,
-  http: { domains: BACKEND_DOMAINS },
+  http: { domains: ["https://reddit-trauma-bot.vercel.app"] },
 });
 
 Devvit.addSettings([
