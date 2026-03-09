@@ -5,11 +5,13 @@ A reddit bot that uses a user's post to query a vector database (VDB) and recomm
 It aims to help people feel more supported / not alone by giving them instant feedback when they post on mental health related subreddits.
 
 ## Data Source
-Used reddit archive from 2005 - 2025
+Reddit archive from 2005 - 2025 (The VDB only contains entries from the last 2 years)
+
 **Filename:** mentalhealth_submissions.jsonl
+
 **From:** https://academictorrents.com/details/3e3f64dee22dc304cdd2546254ca1f8e8ae542b4
 
-## Infra
+## Setup
 ```
         +----------------+                     +--------------------+                     +----------------+
         |                | 1. POST body JSON   |                    | 2. Vector search    |                |
@@ -25,3 +27,6 @@ Used reddit archive from 2005 - 2025
         - If post exists: show to user
         - If post is deleted: call Express "tag deleted" endpoint
 ```
+- `/devvit` contains logic for devvit bot / mod tool.
+- `/express-backend` contains APIs to query ChromaDB. Runs on an express.js server.
+- `/chroma-db` contains an Jupyter Notebook on how the vector database was created.
