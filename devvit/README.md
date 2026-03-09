@@ -16,7 +16,7 @@ Please see https://github.com/remuspoon/reddit-trauma-bot for the full repositor
 
 The following domains are requested for this app:
 
-- https://reddit-trauma-bot.vercel.app/`
+- https://reddit-trauma-bot.vercel.app/
 
 This is a stateless backend that communicates with ChromaDB. The repository for the server is publicly available at https://github.com/remuspoon/reddit-trauma-bot. This repository contains files for the express backend, devvit, and jupyter notebook for constructing the vector database.
 
@@ -102,11 +102,7 @@ Fires whenever a new post is submitted to an installed subreddit.
 
 ## App Settings
 
-Configured via the Devvit developer portal or `devvit settings set`. Both are scoped to the app (not per-subreddit).
-
 | Setting | Type | Description |
 |---------|------|-------------|
-| `EXPRESS_BACKEND_URL` | string | Base URL of the Express backend (e.g. `https://remuspoon.com`) |
+| `EXPRESS_BACKEND_URL` | string | Base URL of the Express backend (`https://reddit-trauma-bot.vercel.app/`) |
 | `EXPRESS_API_KEY` | string (secret) | API key sent as `x-api-key` on every request to the backend |
-
-`EXPRESS_API_KEY` is marked `isSecret: true` — it is encrypted at rest and never exposed in logs or the UI after being set.
